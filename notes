@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Notes App</title>
+    <!-- Google Fonts for a distinctive look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- React mounts into this div -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+})
+
+/* ============================================
+   App.css — Styling for the Simple Notes App
+   ============================================
+   Uses CSS variables for consistent theming,
+   smooth transitions, and a dark modern look.
+*/
+
+/* ---- CSS Variables (Theme) ---- */
+:root {
+  --bg-primary: #0f0f1a;
+  --bg-secondary: #1a1a2e;
+  --bg-card: rgba(30, 41, 59, 0.65);
+  --border-subtle: rgba(148, 163, 184, 0.12);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --accent: #6366f1;
+  --accent-hover: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+  --danger: #f87171;
+  --radius: 12px;
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', 'Segoe UI', sans-serif;
+}
+
+/* ---- Global Reset ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- Page Layout ---- */
+.page {
+  min-height: 100vh;
+  background: linear-gradient(145deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ---- Decorative Background Circles ---- */
+.bg-circle {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.bg-circle-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+  top: -120px;
+  right: -120px;
+}
+.bg-circle-2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(244, 114, 182, 0.06) 0%, transparent 70%);
+  bottom: -60px;
+  left: -60px;
+}
+
+/* ---- Container ---- */
+.container {
+  width: 100%;
+  max-width: 560px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Header ---- */
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.title {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* ---- Input Area ---- */
+.input-area {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.note-input {
+  flex: 1;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  outline: none;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.note-input::placeholder {
+  color: var(--text-muted);
+}
+.note-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ---- Add Button ---- */
+.add-button {
+  padding: 14px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), #8b5cf6);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 16px var(--accent-glow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.add-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.add-button:active {
+  transform: translateY(0);
+}
+
+/* ---- Stats Bar ---- */
+.stats-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+.note-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.clear-button {
+  font-size: 0.8rem;
+  color: var(--danger);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-family: var(--font-body);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+.clear-button:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ---- Notes List ---- */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---- Individual Note Card ---- */
+.note-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  backdrop-filter: blur(8px);
+  transition: transform 0.15s ease, border-color 0.2s ease;
+  animation: slideIn 0.25s ease-out;
+}
+.note-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+/* Animation for notes appearing */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.note-text {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  line-height: 1.55;
+  word-break: break-word;
+}
+.note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.note-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+.delete-button {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.delete-button:hover {
+  color: var(--danger);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 52px 20px;
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 16px;
+  border: 1px dashed rgba(148, 163, 184, 0.15);
+}
+.empty-icon {
+  font-size: 2.8rem;
+  margin-bottom: 14px;
+}
+.empty-text {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.empty-hint {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ---- Footer ---- */
+.footer {
+  text-align: center;
+  margin-top: 44px;
+  font-size: 0.75rem;
+  color: #334155;
+  letter-spacing: 0.5px;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 500px) {
+  .input-area {
+    flex-direction: column;
+  }
+  .add-button {
+    width: 100%;
+  }
+  .title {
+    font-size: 2rem;
+  }
+}
+
+/**
+ * main.jsx — Entry Point
+ * =======================
+ * This is the first file that runs when the app starts.
+ * It imports React and renders our App component into the HTML page.
+ *
+ * React Concepts:
+ *  - ReactDOM.createRoot() creates a root where React controls the DOM
+ *  - .render() tells React what to display (our <App /> component)
+ */
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './App.css'
+
+// Find the <div id="root"> in index.html and render our React app inside it
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+/**
+ * ============================================
+ * App.jsx — Main Parent Component
+ * ============================================
+ *
+ * This is the TOP-LEVEL COMPONENT of the Notes App.
+ * It manages ALL the state and passes data + functions
+ * down to child components (NoteInput, NoteItem) via PROPS.
+ *
+ * React Concepts Used in This File:
+ * ----------------------------------
+ *  1. JSX — HTML-like syntax inside JavaScript
+ *  2. COMPONENTS — We import and use NoteInput and NoteItem
+ *  3. useState() — Hook that creates reactive state variables
+ *  4. PROPS — We pass data and functions to child components
+ *  5. EVENT HANDLERS — addNote(), deleteNote(), clearAll()
+ *  6. map() — Loops through the notes array to render a list
+ *  7. CONDITIONAL RENDERING — Show empty state vs. notes list
+ */
+
+import { useState } from 'react';
+import NoteInput from './NoteInput';
+import NoteItem from './NoteItem';
+
+function App() {
+
+  // =============================================
+  // STATE — useState() Hook
+  // =============================================
+  // useState() creates a state variable and a function to update it.
+  // When state changes, React RE-RENDERS the component automatically.
+
+  // "notes" is an ARRAY that holds all our note objects.
+  // Each note looks like: { id: 123, text: "Hello", time: "2:30 PM" }
+  // "setNotes" is the function we use to update this array.
+  const [notes, setNotes] = useState([]);
+
+  // "inputValue" stores whatever the user is currently typing.
+  // "setInputValue" updates it as they type each character.
+  const [inputValue, setInputValue] = useState('');
+
+  // =============================================
+  // EVENT HANDLER: Add a new note
+  // =============================================
+  // This function runs when the user clicks "Add Note" or presses Enter.
+  function addNote() {
+    // Don't add empty notes — trim() removes extra whitespace
+    if (inputValue.trim() === '') return;
+
+    // Create a new note object
+    const newNote = {
+      id: Date.now(),           // unique id using current timestamp in milliseconds
+      text: inputValue.trim(),  // the note text the user typed
+      time: new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      }), // formatted time like "2:30 PM"
+    };
+
+    // Update state with the NEW array:
+    // ...notes = spread operator copies all existing notes
+    // newNote = the new note added at the end
+    // We NEVER mutate state directly — always create a new array!
+    setNotes([...notes, newNote]);
+
+    // Clear the input field after adding
+    setInputValue('');
+  }
+
+  // =============================================
+  // EVENT HANDLER: Delete a note
+  // =============================================
+  // This removes a note by its id using the filter() method.
+  // filter() creates a NEW array that includes only notes whose
+  // id does NOT match the one we want to delete.
+  function deleteNote(id) {
+    setNotes(notes.filter((note) => note.id !== id));
+  }
+
+  // =============================================
+  // EVENT HANDLER: Clear all notes
+  // =============================================
+  // Resets the notes array to empty
+  function clearAll() {
+    setNotes([]);
+  }
+
+  // =============================================
+  // JSX — What React Renders to the Screen
+  // =============================================
+  // JSX looks like HTML, but it's JavaScript under the hood.
+  // Curly braces {} let us embed JS expressions inside JSX.
+  return (
+    <div className="page">
+      {/* Decorative background circles */}
+      <div className="bg-circle bg-circle-1" />
+      <div className="bg-circle bg-circle-2" />
+
+      <div className="container">
+
+        {/* ---- Header ---- */}
+        <header className="header">
+          <h1 className="title">My Notes</h1>
+          <p className="subtitle">A simple place to capture your thoughts</p>
+        </header>
+
+        {/* ---- Note Input ---- */}
+        {/*
+          PROPS: We pass state and handler functions to the child component.
+          • value={inputValue}      — passes the current input text
+          • onChange={setInputValue} — passes the function to update it
+          • onAdd={addNote}          — passes the function to add a note
+        */}
+        <NoteInput
+          value={inputValue}
+          onChange={setInputValue}
+          onAdd={addNote}
+        />
+
+        {/* ---- Stats Bar: shows total number of notes ---- */}
+        <div className="stats-bar">
+          {/* notes.length gives us the count of items in the array */}
+          <span className="note-count">
+            {notes.length} {notes.length === 1 ? 'note' : 'notes'}
+          </span>
+
+          {/* CONDITIONAL RENDERING: only show "Clear All" if there are notes */}
+          {notes.length > 0 && (
+            <button className="clear-button" onClick={clearAll}>
+              Clear All
+            </button>
+          )}
+        </div>
+
+        {/* ---- Notes List ---- */}
+        <div className="notes-list">
+          {/*
+            CONDITIONAL RENDERING:
+            If the array is empty → show the empty state message
+            If the array has notes → use map() to render each one
+          */}
+          {notes.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🗒️</div>
+              <p className="empty-text">No notes yet</p>
+              <p className="empty-hint">
+                Type something above and click "Add Note" to get started!
+              </p>
+            </div>
+          ) : (
+            /*
+              map() — Rendering a List
+              ========================
+              map() loops through each item in the "notes" array.
+              For each note, it returns a <NoteItem /> component.
+
+              KEY PROP: React requires a unique "key" on each list item
+              so it can efficiently track which items changed, were added,
+              or were removed. We use note.id as the key.
+
+              PROPS passed to each NoteItem:
+              • note={note}           — the full note object (id, text, time)
+              • onDelete={deleteNote} — the function to remove this note
+            */
+            notes.map((note) => (
+              <NoteItem
+                key={note.id}
+                note={note}
+                onDelete={deleteNote}
+              />
+            ))
+          )}
+        </div>
+
+        {/* ---- Footer ---- */}
+        <footer className="footer">
+          Built with React · useState · Props · map()
+        </footer>
+
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+/**
+ * NoteInput Component
+ * ===================
+ * This CHILD COMPONENT handles user input — the text field and "Add Note" button.
+ *
+ * React Concepts Used:
+ *  - PROPS: Receives data and functions from the parent (App):
+ *    • "value" — the current text in the input (controlled by parent's state)
+ *    • "onChange" — function to update the parent's state when the user types
+ *    • "onAdd" — function to add the note when the button is clicked
+ *  - CONTROLLED INPUT: The input's value comes from React state (via props),
+ *    not from the DOM. This is a core React pattern.
+ *  - EVENT HANDLERS:
+ *    • onChange — fires every keystroke, keeping state in sync with the input
+ *    • onClick — fires when the "Add Note" button is clicked
+ *    • onKeyDown — fires when a key is pressed; we check for Enter
+ */
+
+function NoteInput({ value, onChange, onAdd }) {
+
+  // This function handles keyboard events on the input
+  // If the user presses Enter, we add the note (same as clicking the button)
+  function handleKeyDown(event) {
+    if (event.key === 'Enter') {
+      onAdd();
+    }
+  }
+
+  return (
+    <div className="input-area">
+      {/*
+        CONTROLLED INPUT:
+        - "value={value}" makes React control what's displayed
+        - "onChange" fires on every keystroke, calling the parent's setter
+        - This keeps the input always in sync with the parent's state
+      */}
+      <input
+        type="text"
+        className="note-input"
+        placeholder="Write something worth remembering..."
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+
+      {/* onClick event handler: triggers addNote() in the parent */}
+      <button className="add-button" onClick={onAdd}>
+        + Add Note
+      </button>
+    </div>
+  );
+}
+
+export default NoteInput;
+
+/**
+ * NoteItem Component
+ * ==================
+ * This is a CHILD COMPONENT that displays a single note.
+ *
+ * React Concepts Used:
+ *  - PROPS: This component receives data from its parent (App).
+ *    • "note" — the note object containing id, text, and time
+ *    • "onDelete" — a function passed down from the parent to remove this note
+ *  - JSX: We write HTML-like code that React converts to real DOM elements
+ *  - EVENT HANDLER (onClick): When the user clicks "Remove", we call onDelete
+ *    with this note's id, so the parent knows which note to delete.
+ */
+
+function NoteItem({ note, onDelete }) {
+  return (
+    <div className="note-card">
+      {/* Display the note text */}
+      <p className="note-text">{note.text}</p>
+
+      <div className="note-footer">
+        {/* Show the time the note was created */}
+        <span className="note-time">{note.time}</span>
+
+        {/*
+          onClick event handler:
+          When the user clicks this button, we call onDelete(note.id).
+          The parent component (App) will then use filter() to remove
+          this note from the notes array.
+        */}
+        <button
+          className="delete-button"
+          onClick={() => onDelete(note.id)}
+        >
+          ✕ Remove
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Export so App.jsx can import and use this component
+export default NoteItem;
+
+{
+  "name": "simple-notes-app",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.1.0"
+  }
+}
